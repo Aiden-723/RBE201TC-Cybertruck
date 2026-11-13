@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>设备监控 · 只读控制台</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到监控内容</a>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><h1>设备监控</h1><span class="read-only">只读</span></div>
+    <div class="toolbar"><span id="connection" class="badge" role="status">等待连接</span><button id="refresh" class="primary" type="button">立即刷新</button><button id="pause" type="button" aria-pressed="false">暂停刷新</button><button id="settings" type="button" aria-expanded="false" aria-controls="settings-panel">连接设置</button></div>
+  </header>
+  <main id="main">
+    <section id="settings-panel" class="settings-panel" aria-labelledby="settings-title" hidden>
+      <h2 id="settings-title">连接设置</h2>
+      <p>仅连接当前页面的同源 API。令牌只保存在此页面内存中，关闭或重新载入页面后清除。</p>
+      <form id="settings-form" autocomplete="off"><label for="token">访问令牌</label><div class="token-row"><input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="输入服务端配置的令牌" aria-describedby="token-help"><button class="primary" type="submit">应用并重试</button><button id="clear-token" type="button">清除令牌</button></div><p id="token-help">未开启认证时可留空。令牌不写入地址、日志或浏览器存储。</p></form>
+    </section>
+    <div class="notice" id="notice" role="status">等待首次读取；暂无测量数据</div>
+    <section class="host-strip" aria-labelledby="host-title"><div><div class="eyebrow">数据来源 / CURRENT HOST</div><h2 id="host-title">当前服务主机 <span id="host-kind" class="tag">身份未验证</span></h2><p id="host-address" class="mono">—</p></div><div class="host-note"><p>资源指标属于运行后端的主机，不默认代表 RDK。</p><p id="updated">尚未收到快照</p></div></section>
+    <section class="section resources-section" aria-labelledby="resources-title"><div class="section-heading"><h2 id="resources-title">系统资源</h2><span id="snapshot-label" class="muted">暂无数据</span></div><div id="resources" class="resources"><p class="empty">等待服务返回实际指标，不使用演示数据。</p></div></section>
+    <section class="section" aria-labelledby="devices-title"><div class="section-heading"><h2 id="devices-title">设备与接口</h2><span class="muted">发现节点 ≠ 功能正常</span></div><table class="device-table"><caption class="sr-only">设备发现、配置及采样状态</caption><thead><tr><th scope="col">设备 / 接口</th><th scope="col">路径或配置</th><th scope="col">证据与状态</th></tr></thead><tbody id="devices"><tr><td colspan="3" class="empty">尚无设备清单</td></tr></tbody></table></section>
+    <section class="section encoder-section" aria-labelledby="encoder-title"><div class="section-heading"><h2 id="encoder-title">编码器原始计数</h2><span id="encoder-status" class="tag warning">编码器未验证</span></div><div id="encoders" class="encoders"><div><span>M1</span><strong>—</strong></div><div><span>M2</span><strong>—</strong></div><div><span>M3</span><strong>—</strong></div><div><span>M4</span><strong>—</strong></div></div><p id="encoder-age" class="muted">尚无原始帧</p><p class="boundary">计数只表示接收到的数据，不推导速度、转动或设备健康；计数持续不变也不能验证编码器。此页面不提供电机控制。</p></section>
+    <details class="raw-detail"><summary>原始响应 <span class="muted">/api/v1/status · schema 1.0</span></summary><p class="muted">最近一次成功响应；生成时间不等于传感器采样时间。</p><pre id="raw" tabindex="0" aria-label="最近一次原始 JSON 响应">尚无响应</pre></details>
+    <footer><span>只读观测 · 未知值显示为 —</span><span>串行轮询 2 秒 / 请求超时 5 秒</span></footer>
+    <noscript><p class="notice">请启用 JavaScript 读取监控数据；当前页面没有任何实时测量。</p></noscript>
+  </main>
+</body>
+</html>

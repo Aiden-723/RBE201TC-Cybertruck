@@ -1,0 +1,94 @@
+'use strict';
+// SOFTWARE_FIXTURE_NOT_COURSE_DATA. Never connects to the live robot or DSH GUI.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {spawn}=require('node:child_process');
+const {createHash}=require('node:crypto');
+const {chromium}=require('/Users/your-user/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const executablePath='/Users/your-user/Documents/Codex/2026-09-18/di/work/browser-cache/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell';
+const fixture=spawn('python3',['-B',path.join(__dirname,'browser_fixture.py')],{env:{...process.env,PYTHONDONTWRITEBYTECODE:'1',DEVICE_CONSOLE_TOKEN:''},stdio:['ignore','pipe','pipe']});
+const exit=new Promise(resolve=>fixture.once('exit',(code,signal)=>resolve({code,signal})));
+let stderr='';fixture.stderr.on('data',chunk=>stderr=(stderr+chunk).slice(-12000));
+const summary={fixture:'SOFTWARE_FIXTURE_NOT_COURSE_DATA',passed:false,real_hardware_used:false,live_robot_url_accessed:false,checks:[],page_errors:[],unexpected_origins:[]};
+let browser,info,postActions=[];
+const listening=new Promise((resolve,reject)=>{let buffer='';const timer=setTimeout(()=>reject(Error('Fixture startup timed out')),10000);fixture.stdout.on('data',chunk=>{buffer+=chunk;if(buffer.includes('\n')){try{const data=JSON.parse(buffer.split('\n')[0]);clearTimeout(timer);resolve(data);}catch(error){clearTimeout(timer);reject(error);}}});fixture.once('exit',code=>{clearTimeout(timer);reject(Error('Fixture exited early: '+code));});});
+const check=name=>summary.checks.push(name);
+async function readDownload(page,id){const waiting=page.waitForEvent('download');await page.locator(id).click();const download=await waiting;const stream=await download.createReadStream(),chunks=[];for await(const chunk of stream)chunks.push(chunk);return {name:download.suggestedFilename(),bytes:Buffer.concat(chunks)};}
+(async()=>{
+  try{
+    info=await listening;assert.equal(info.fixture,summary.fixture);assert.notEqual(new URL(info.url).port,'8765');assert.notEqual(new URL(info.url).port,'55807');
+    browser=await chromium.launch({executablePath,headless:true});
+    const context=await browser.newContext({viewport:{width:1280,height:1000},acceptDownloads:true});
+    await context.route('**/*',route=>{const url=route.request().url();if(url.startsWith('blob:')||new URL(url).origin===info.url)return route.continue();summary.unexpected_origins.push(url);return route.abort();});
+    const page=await context.newPage();page.on('pageerror',error=>summary.page_errors.push(error.message));
+    page.on('request',request=>{if(request.method()==='POST'){let action;try{action=JSON.parse(request.postData()||'{}').action;}catch{}postActions.push({path:new URL(request.url()).pathname,action:action||'fixture_only'});}});
+    const mode=async data=>{const response=await page.request.post(info.url+'/__fixture/mode',{data});assert.equal(response.status(),200);};
+    const evidence=async()=>{const response=await page.request.get(info.url+'/__fixture/evidence');return (await response.json()).data;};
+    const control=async()=>page.evaluate(async()=>{const d=(await(await fetch('/api/v1/control')).json()).data;return {state:d.state,enabled:d.enabled,outputs:d.outputs,max_hold_seconds:d.max_hold_seconds,drive_commands_sent:d.drive_commands_sent};});
+    const waitOutputs=async values=>page.waitForFunction(async expected=>{const d=(await(await fetch('/api/v1/control')).json()).data;return JSON.stringify(d.outputs)===JSON.stringify(expected);},values,{polling:100,timeout:4000});
+    await page.goto(info.url,{waitUntil:'domcontentloaded'});
+    await page.locator('#acq-start:not([disabled])').waitFor();
+    assert.equal(postActions.length,0);assert.equal(await page.locator('#drive-speed').inputValue(),'200');
+    assert.equal((await evidence()).virtual_nonzero_packets,0);check('Real Chromium initialization performs GET only; default speed 200; no virtual nonzero packet');
+    await page.locator('#acq-notes').fill('SOFTWARE_FIXTURE_NOT_COURSE_DATA');await page.locator('#acq-notes').press('Space');
+    assert.equal(await page.locator('#acq-notes').inputValue(),'SOFTWARE_FIXTURE_NOT_COURSE_DATA ');
+    assert.equal((await evidence()).virtual_nonzero_packets,0);check('Enabled-control Space inserts exactly one text space and retains emergency stop without movement');
+    await page.locator('#acq-notes').fill('SOFTWARE_FIXTURE_NOT_COURSE_DATA · 非场地数据，不用于地图');
+    await page.locator('#acq-start').click();await page.locator('#acq-capture:not([disabled])').waitFor();
+    const runId=await page.locator('#acq-run').inputValue();assert.match(runId,/^[A-Za-z0-9_-]+$/);
+    await mode({mode:'hold'});await page.locator('#acq-capture').click();
+    await page.locator('#acq-events tr[data-status="pending"]').waitFor();
+    assert.equal(await page.locator('#acq-events tr[data-status="pending"] td').nth(2).innerText(),'—');check('Pending appears before new outcome, with no invented zero');
+    await mode({mode:'success'});await page.locator('#acq-events tr[data-status="success"]').waitFor();
+    assert.equal(await page.locator('#acq-events tr[data-status="success"] td').nth(2).innerText(),'23.5');
+    await page.locator('#acq-capture:not([disabled])').waitFor();await mode({mode:'failure'});await page.locator('#acq-capture').click();
+    await page.locator('#acq-events tr[data-status="sensor_failure"]').waitFor();
+    assert.equal(await page.locator('#acq-events tr[data-status="sensor_failure"] td').nth(2).innerText(),'—');
+    assert.equal(await page.locator('#acq-events img').count(),0);assert.equal(await page.evaluate(()=>window.__acq_xss),undefined);check('New failure is retained with blank values and literal, nonexecuted error text');
+    await page.locator('#acq-capture:not([disabled])').waitFor();await mode({mode:'hold'});await page.locator('#acq-capture').click();
+    await page.locator('#acq-events tr[data-status="pending"]').waitFor();await page.locator('#acq-cancel').click();
+    await page.locator('#acq-events tr[data-status="cancelled"]').waitFor();check('Accepted cancellation retains its own terminal row');
+    await page.locator('#acq-close').click();await page.locator('#acq-start:not([disabled])').waitFor();
+    const data=await evidence();assert.equal(data.closed,true);assert.deepEqual(data.statuses,['success','sensor_failure','cancelled']);
+    assert.equal(data.row_count,3);assert.deepEqual(data.purposes,['bench_diagnostic']);assert.equal(data.failure_values_blank,true);assert.equal(data.coordinates_blank,true);
+    const csv=await readDownload(page,'#acq-csv'),manifest=await readDownload(page,'#acq-manifest');
+    const sha=createHash('sha256').update(csv.bytes).digest('hex'),parsed=JSON.parse(manifest.bytes.toString('utf8'));
+    assert.equal(sha,data.raw_csv_sha256);assert.equal(parsed.raw_csv_sha256,sha);assert.equal(parsed.row_count,3);assert.equal(parsed.acquisition_transport,'in_process_snapshot');
+    assert.equal(csv.bytes.subarray(0,3).toString('hex'),'efbbbf');check('Actual browser CSV/manifest downloads match durable raw SHA-256 and 3 events; all bench/unlocated');
+    const capturesBefore=postActions.filter(p=>p.path==='/api/v1/experiments').length;
+    await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(id=>document.getElementById('acq-run').value===id,runId);
+    assert.equal(await page.locator('#acq-events tr').count(),3);assert.equal(postActions.filter(p=>p.path==='/api/v1/experiments').length,capturesBefore);check('Page reload recovers server records without an automatic capture or restart');
+    await page.locator('#acq-purpose').selectOption('room_stationary');await page.locator('#acq-start').click();
+    assert.match(await page.locator('#acq-message').innerText(),/表头|真实测量/);
+    assert.equal(postActions.filter(p=>p.path==='/api/v1/experiments').length,capturesBefore);await page.locator('#acq-purpose').selectOption('bench_diagnostic');check('Missing actual formal station table is refused before any write');
+    await page.locator('h1').click();await page.keyboard.down('w');await waitOutputs([200,200,200,200]);
+    await page.waitForTimeout(3300);const held=await control();assert.deepEqual(held.outputs,[200,200,200,200]);assert.equal(held.max_hold_seconds,null);assert.ok(held.drive_commands_sent>=20);
+    await page.keyboard.up('w');await waitOutputs([0,0,0,0]);check('Virtual transport only: genuine browser W hold exceeds 3 seconds at default 200, release stops');
+    await page.keyboard.down('w');await waitOutputs([200,200,200,200]);await page.keyboard.press('Space');await waitOutputs([0,0,0,0]);await page.keyboard.up('w');
+    await page.waitForTimeout(600);assert.deepEqual((await control()).outputs,[0,0,0,0]);check('Virtual transport only: Space emergency stop does not resume held input');
+    await mode({motor_enabled:false});await page.waitForFunction(()=>document.getElementById('drive-status').textContent.includes('未开启'));
+    await page.locator('#acq-notes').fill('SOFTWARE_FIXTURE');await page.locator('#acq-notes').press('Space');assert.equal(await page.locator('#acq-notes').inputValue(),'SOFTWARE_FIXTURE ');check('Disabled-control Space still inserts exactly once in real Chromium');
+    await page.reload({waitUntil:'domcontentloaded'});await page.locator('#acq-start:not([disabled])').waitFor();
+    await page.setViewportSize({width:1280,height:1800});
+    await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.body.style.scrollBehavior='auto';document.activeElement?.blur?.();});
+    await page.locator('#acq-notes').fill('SOFTWARE_FIXTURE_NOT_COURSE_DATA · 非实物数据');await page.locator('#acq-notes').blur();
+    await page.locator('#acquisition-panel').evaluate(element=>{const label=document.createElement('p');label.textContent='纯软件隔离夹具 · 非板上页面 · 非实物测量 · 不用于课程房间地图';label.style.cssText='background:#fff0dc;color:#8b351b;padding:14px;font-weight:700;border:2px solid #d49a64';element.prepend(label);});
+    assert.ok(await page.locator('#acquisition-panel').evaluate(element=>element.scrollHeight<=element.clientHeight+2));
+    await page.locator('#acquisition-panel').screenshot({path:path.join(__dirname,'software-fixture-acquisition.png'),animations:'disabled'});
+    await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.setViewportSize({width:390,height:1800});
+    assert.ok(await page.locator('#acquisition-panel').evaluate(element=>element.scrollHeight<=element.clientHeight+2));
+    await page.locator('#acquisition-panel').screenshot({path:path.join(__dirname,'software-fixture-acquisition-mobile.png'),animations:'disabled'});check('Desktop/mobile panel layouts inspected; mobile page has no horizontal overflow');
+    assert.deepEqual(summary.page_errors,[]);assert.deepEqual(summary.unexpected_origins,[]);
+    summary.persisted_fixture={row_count:data.row_count,statuses:data.statuses,purpose:data.purposes[0],coordinates_blank:true,failure_values_blank:true,csv_sha256:sha};
+    summary.control_post_actions=postActions.filter(p=>p.path==='/api/v1/control').map(p=>p.action);summary.real_chromium=true;summary.passed=true;
+  }catch(error){summary.error=error.stack||String(error);process.exitCode=1;}
+  finally{
+    if(browser)await browser.close();fixture.kill('SIGTERM');
+    const ended=await Promise.race([exit,new Promise(resolve=>setTimeout(()=>resolve({timeout:true}),10000))]);
+    if(ended.timeout){fixture.kill('SIGKILL');summary.cleanup_error='Fixture did not stop gracefully';process.exitCode=1;summary.passed=false;}
+    summary.fixture_exit=ended;summary.fixture_stderr=stderr;summary.temporary_fixture_cleaned=!!info&&!fs.existsSync(info.temporary_root);
+    fs.writeFileSync(path.join(__dirname,'browser-summary.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary,null,2));
+  }
+})();

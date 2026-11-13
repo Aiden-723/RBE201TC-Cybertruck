@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "mission_id": null,
+  "group_id": null,
+  "room_id": null,
+  "stations": [],
+  "calibration": {
+    "white_reference": "calibration/white_reference_20261104.json",
+    "black_reference": null,
+    "physical_left_to_right_order": null,
+    "physical_order_evidence_id": null
+  },
+  "timing": {
+    "max_observation_age": null,
+    "max_update_gap": null,
+    "stop_timeout": null,
+    "settle_seconds": null,
+    "adapt_seconds": null,
+    "capture_timeout": null,
+    "mission_timeout": null
+  },
+  "route_evidence_id": null,
+  "marker_evidence_id": null,
+  "stationary_evidence_id": null,
+  "timing_evidence_id": null,
+  "guidance": {
+    "positions": null,
+    "deadband": null,
+    "speed": null
+  },
+  "crossings": {
+    "confirm_seconds": null,
+    "confirm_frames": null,
+    "clear_frames": null,
+    "max_gap": null
+  },
+  "loop": {
+    "period": null,
+    "stationary_max_age": null
+  }
+}

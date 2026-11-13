@@ -1,0 +1,17 @@
+Host rbe201tc-wired
+    HostName 192.168.127.10
+Host rbe201tc-wifi
+    HostName 192.168.86.5
+Host rbe201tc-wired rbe201tc-wifi
+    User sunrise
+    IdentityFile ~/.ssh/rbe201tc_ed25519
+    IdentitiesOnly yes
+    UserKnownHostsFile ~/.ssh/rbe201tc_known_hosts
+    GlobalKnownHostsFile /dev/null
+    StrictHostKeyChecking yes
+    BatchMode yes
+    ControlMaster no
+    ControlPath none
+    ControlPersist no
+    ExitOnForwardFailure yes
+    LocalForward 127.0.0.1:8765 127.0.0.1:8765

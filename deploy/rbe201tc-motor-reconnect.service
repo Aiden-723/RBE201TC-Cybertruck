@@ -1,0 +1,7 @@
+[Unit]
+Description=Reconnect the existing RBE201TC monitor after motor USB is plugged in
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl try-restart rbe201tc-monitor.service
+TimeoutStartSec=30

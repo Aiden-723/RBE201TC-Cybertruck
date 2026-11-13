@@ -1,0 +1,17 @@
+[Unit]
+Description=RBE201TC independent sensor sampler
+Wants=hobot-modules-load.service hobot-rc.service
+After=local-fs.target hobot-modules-load.service hobot-rc.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/sunrise/rbe201tc-sensor-studio/readonly-current
+ExecStart=/usr/bin/python3 -B -u backend/hardware_worker.py --state-dir /dev/shm/rbe201tc-sensor-studio --dht-binary /home/sunrise/rbe201tc-sensor-studio/readonly-current/backend/native/dht11_server
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+TimeoutStopSec=12
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+# Separate the observed motor adapter (7522) from the IMU adapter (7523).
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7522", SYMLINK+="rbe201tc-motor", TAG+="systemd"
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7522", ENV{SYSTEMD_WANTS}+="rbe201tc-motor-reconnect.service"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="rbe201tc-imu"

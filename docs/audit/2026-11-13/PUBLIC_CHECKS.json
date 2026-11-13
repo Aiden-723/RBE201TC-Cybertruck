@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-13",
+  "scope": "public copy offline tests on macOS; no board contacted",
+  "backend": {
+    "run": 481,
+    "passed": 477,
+    "skipped": 4,
+    "failed": 0
+  },
+  "tools": {
+    "run": 139,
+    "passed": 139,
+    "failed": 0
+  },
+  "frontend": {
+    "run": 151,
+    "passed": 151,
+    "failed": 0
+  },
+  "desktop": {
+    "run": 22,
+    "passed": 22,
+    "failed": 0
+  },
+  "matlab_executed": 0,
+  "secret_scan": {
+    "private_key_blocks": 0,
+    "github_tokens": 0,
+    "api_key_pattern": 0,
+    "known_wifi_password_literals": 0,
+    "personal_home_paths": 0,
+    "compressed_test_fixture_included_in_scan": true
+  },
+  "exclusions": [
+    "private SSH identities and host configuration",
+    "private raw drive logs and chat exports",
+    "course PDFs and firmware binaries",
+    "virtual environments and bytecode"
+  ]
+}

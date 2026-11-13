@@ -1,0 +1,21 @@
+{
+  "turns": [
+    "left",
+    "left",
+    "right",
+    "right",
+    "left",
+    "left",
+    "right",
+    "right",
+    "left",
+    "left",
+    "right",
+    "right",
+    "left",
+    "left"
+  ],
+  "turn_offset_seconds": 0.0,
+  "yaw_left_sign": 1,
+  "controller": "track_imu"
+}

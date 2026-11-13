@@ -1,0 +1,2 @@
+# Required by Linux pseudo-terminal tests; offline HTTP/logic tests use the stdlib.
+pyserial>=3.5,<4

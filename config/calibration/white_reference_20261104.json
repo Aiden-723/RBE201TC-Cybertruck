@@ -1,0 +1,461 @@
+{
+  "reference": "white_paper",
+  "user_confirmed_ready": true,
+  "motor_battery": "user_disconnected",
+  "setup": "vehicle level; all four probes over white paper at normal driving height; no paper touching probes",
+  "recorded_at": "2026-11-04T11:45:40.510701+08:00",
+  "ended_at": "2026-11-04T11:45:43.785764+08:00",
+  "host": {
+    "hostname": "ubuntu",
+    "model": "D-Robotics RDK X5 V1.0",
+    "is_rdk": true,
+    "device_time": "2026-11-04T11:45:43.663282+08:00",
+    "clock_valid": true
+  },
+  "samples": [
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4437.887248249,
+      "sampled_at": "2026-11-04T11:45:40.399442+08:00",
+      "successes": 20419,
+      "failures": 0,
+      "age_seconds": 0.10518038000009255,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.039658355,
+      "sampled_at": "2026-11-04T11:45:40.551851+08:00",
+      "successes": 20420,
+      "failures": 0,
+      "age_seconds": 0.058480149999923015,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.192405666,
+      "sampled_at": "2026-11-04T11:45:40.704600+08:00",
+      "successes": 20421,
+      "failures": 0,
+      "age_seconds": 0.010458429999744112,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.345352435,
+      "sampled_at": "2026-11-04T11:45:40.857546+08:00",
+      "successes": 20422,
+      "failures": 0,
+      "age_seconds": 0.07698323500062543,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.498214912,
+      "sampled_at": "2026-11-04T11:45:41.010409+08:00",
+      "successes": 20423,
+      "failures": 0,
+      "age_seconds": 0.03658529700078361,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.65061531,
+      "sampled_at": "2026-11-04T11:45:41.162808+08:00",
+      "successes": 20424,
+      "failures": 0,
+      "age_seconds": 0.09713014099997963,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.803145539,
+      "sampled_at": "2026-11-04T11:45:41.315340+08:00",
+      "successes": 20425,
+      "failures": 0,
+      "age_seconds": 0.047916387999975996,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4438.956102058,
+      "sampled_at": "2026-11-04T11:45:41.468296+08:00",
+      "successes": 20426,
+      "failures": 0,
+      "age_seconds": 0.005053715999565611,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.108677829,
+      "sampled_at": "2026-11-04T11:45:41.620870+08:00",
+      "successes": 20427,
+      "failures": 0,
+      "age_seconds": 0.07065448499997729,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.262322843,
+      "sampled_at": "2026-11-04T11:45:41.774519+08:00",
+      "successes": 20428,
+      "failures": 0,
+      "age_seconds": 0.02479595899967535,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.415643192,
+      "sampled_at": "2026-11-04T11:45:41.927836+08:00",
+      "successes": 20429,
+      "failures": 0,
+      "age_seconds": 0.08312361000025703,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.568129963,
+      "sampled_at": "2026-11-04T11:45:42.080324+08:00",
+      "successes": 20430,
+      "failures": 0,
+      "age_seconds": 0.03851636800027336,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.720753942,
+      "sampled_at": "2026-11-04T11:45:42.232947+08:00",
+      "successes": 20431,
+      "failures": 0,
+      "age_seconds": 0.10040799500075082,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4439.873339172,
+      "sampled_at": "2026-11-04T11:45:42.385533+08:00",
+      "successes": 20432,
+      "failures": 0,
+      "age_seconds": 0.05337389299984352,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.026376856,
+      "sampled_at": "2026-11-04T11:45:42.538571+08:00",
+      "successes": 20433,
+      "failures": 0,
+      "age_seconds": 0.014184822000061104,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.178707879,
+      "sampled_at": "2026-11-04T11:45:42.690901+08:00",
+      "successes": 20434,
+      "failures": 0,
+      "age_seconds": 0.0803469619995667,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.331215109,
+      "sampled_at": "2026-11-04T11:45:42.843409+08:00",
+      "successes": 20435,
+      "failures": 0,
+      "age_seconds": 0.034088354999767034,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.484011503,
+      "sampled_at": "2026-11-04T11:45:42.996205+08:00",
+      "successes": 20436,
+      "failures": 0,
+      "age_seconds": 0.10250644000007014,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.636653982,
+      "sampled_at": "2026-11-04T11:45:43.148848+08:00",
+      "successes": 20437,
+      "failures": 0,
+      "age_seconds": 0.0538645569995424,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.789798583,
+      "sampled_at": "2026-11-04T11:45:43.301992+08:00",
+      "successes": 20438,
+      "failures": 0,
+      "age_seconds": 0.0052827559993602335,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4440.942286938,
+      "sampled_at": "2026-11-04T11:45:43.454479+08:00",
+      "successes": 20439,
+      "failures": 0,
+      "age_seconds": 0.08870465600011812,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    },
+    {
+      "value": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "monotonic": 4441.094791417,
+      "sampled_at": "2026-11-04T11:45:43.606985+08:00",
+      "successes": 20440,
+      "failures": 0,
+      "age_seconds": 0.0420488439995097,
+      "physical_pins": [
+        15,
+        18,
+        16,
+        11
+      ]
+    }
+  ],
+  "unique_samples": 22,
+  "counts_X1_to_X4": [
+    {
+      "0": 22
+    },
+    {
+      "0": 22
+    },
+    {
+      "0": 22
+    },
+    {
+      "0": 22
+    }
+  ],
+  "stable_levels_X1_to_X4": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "errors": [],
+  "black_reference_not_measured": true,
+  "polarity_verified": false,
+  "physical_left_to_right_order": null,
+  "method": "HTTP GET only; no GPIO/UART ownership changes or control requests"
+}

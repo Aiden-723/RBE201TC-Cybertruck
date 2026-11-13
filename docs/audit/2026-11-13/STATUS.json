@@ -1,0 +1,37 @@
+{
+  "status": "LOCAL_ONLY_NOT_DEPLOYED",
+  "total": 793,
+  "passed": 792,
+  "skipped": 1,
+  "failed": 0,
+  "suites": {
+    "backend": {
+      "run": 481,
+      "pass": 480,
+      "skip": 1,
+      "log": "backend_full.log"
+    },
+    "tools": {
+      "run": 139,
+      "pass": 139,
+      "skip": 0,
+      "log": "tools_full.log"
+    },
+    "frontend": {
+      "run": 151,
+      "pass": 151,
+      "skip": 0,
+      "log": "frontend_full.log"
+    },
+    "connection": {
+      "run": 22,
+      "pass": 22,
+      "skip": 0,
+      "log": "connection_full.log"
+    }
+  },
+  "robot_contacted": false,
+  "matlab_tests_executed": 0,
+  "source_files": 42,
+  "firmware_scope": "Archived real Thumb instruction emulation only; no current board read-back or physical output verification"
+}

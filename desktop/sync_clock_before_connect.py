@@ -1,0 +1,38 @@
+"""Run over SSH before the new local tunnel opens; never adjust during a run."""
+import json
+import math
+import subprocess
+import sys
+import time
+import urllib.request
+
+
+def synchronize(target, *, now=time.time, read=None, execute=subprocess.run):
+    if type(target) not in (int, float) or not math.isfinite(target) or not 1735689600 <= target <= 4102444800:
+        raise ValueError('Invalid computer clock')
+    if abs(now()-target) <= 5:
+        return {'clock': 'already_current'}
+    if read is None:
+        http = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        def read(endpoint):
+            with http.open('http://127.0.0.1:8765/api/v1/'+endpoint, timeout=3) as response:
+                return json.load(response)['data']
+    acquisition = read('experiments')
+    control = read('control')
+    disabled = (control.get('enabled') is False and control.get('state') == 'disabled')
+    outputs = control.get('outputs')
+    stopped = (control.get('enabled') is True and control.get('state') == 'stopped'
+               and control.get('fault') is None and isinstance(outputs, list)
+               and len(outputs) == 4 and all(type(x) is int and x == 0 for x in outputs))
+    if (acquisition.get('active_run_id') is not None or acquisition.get('busy') is not False
+            or control.get('armed') is not False or not (disabled or stopped)):
+        return {'clock': 'unchanged_active_run_or_control', 'attention_required': True}
+    execute(['sudo', '-n', '/bin/date', '-u', '-s', '@'+str(int(target))],
+            check=True, stdout=subprocess.DEVNULL, timeout=5)
+    if abs(now()-target) > 5:
+        raise RuntimeError('Clock correction was not verified')
+    return {'clock': 'synchronized_from_mac', 'no_active_run': True}
+
+
+if __name__ == '__main__':
+    print(json.dumps(synchronize(int(sys.argv[1]))), flush=True)

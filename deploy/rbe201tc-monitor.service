@@ -1,0 +1,18 @@
+[Unit]
+Description=RBE201TC monitor with speed control when motor USB is connected
+Wants=rbe201tc-sensors.service
+After=network.target rbe201tc-sensors.service
+
+[Service]
+Type=simple
+User=sunrise
+WorkingDirectory=/home/sunrise/rbe201tc-sensor-studio/readonly-current
+ExecStart=/usr/bin/python3 -B -u deploy/start_monitor.py
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+TimeoutStopSec=12
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

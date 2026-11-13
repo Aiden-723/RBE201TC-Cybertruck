@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-11-04",
+  "time_zone": "Asia/Shanghai",
+  "source": "direct_user_physical_test_feedback",
+  "user_statement": "我刚才测试的四个轮子的前后左右全都对，我先把电机电池拔了现在，因为调试好了，暂时用不到",
+  "wheel_direction_controls": {
+    "user_reports_all_correct": true,
+    "production_command_mode": "speed",
+    "production_default_setpoint": 200,
+    "existing_side_convention": {
+      "left": [
+        "M1",
+        "M2"
+      ],
+      "right": [
+        "M3",
+        "M4"
+      ]
+    },
+    "per_channel_front_rear_corner": {
+      "M1": null,
+      "M2": null,
+      "M3": null,
+      "M4": null
+    },
+    "corner_mapping_note": "User confirmed directions correct; exact front/rear corner for each numbered channel was not separately supplied and is not invented.",
+    "encoder_feedback_verified": false,
+    "measured_speed_verified": false
+  },
+  "motor_power": {
+    "previous_state": "user_disconnected_motor_battery_after_direction_test",
+    "latest_user_statement": "我重新插了一下电机的线，现在键盘又控制不了了",
+    "state": "user_replugged_motor_connection; driver_supply_readback_available_after_service_reopen",
+    "instruction": "User confirmed repaired controls work. Preserve current control implementation; no automated motion or repeated direction test. Specific physical connector was not separately identified.",
+    "last_startup_voltage_query_v": 11.7,
+    "fresh_startup_diagnostics_observed_at": "2026-11-04T13:12:04+08:00",
+    "voltage_is_continuously_refreshed": false,
+    "hotplug_recovery": {
+      "previous_device": "/dev/ttyUSB0 (deleted)",
+      "current_device": "/dev/ttyUSB1",
+      "stable_identity": "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0",
+      "old_fault": "serial_stop_failed",
+      "old_web_pid": 4097,
+      "new_web_pid": 117483,
+      "new_control_state": "stopped",
+      "source_changed": false,
+      "sensor_workers_restarted": false,
+      "physical_motion_after_recovery_confirmed": true,
+      "confirmation_source": "direct_user_feedback",
+      "confirmation_statement": "好了，现在电机控制一点问题都没有了，我们要忙下一个了"
+    }
+  },
+  "line_sensors": {
+    "channel_order": [
+      "X1",
+      "X2",
+      "X3",
+      "X4"
+    ],
+    "physical_board_pins": [
+      15,
+      18,
+      16,
+      11
+    ],
+    "physical_left_to_right_order": [
+      "X4",
+      "X3",
+      "X2",
+      "X1"
+    ],
+    "physical_order_source": "current_user_physical_leftmost_black_with_forward_view_and_live_gpio_20261113",
+    "physical_order_previous_assumption": "Identity was applied from nonspecific reversal feedback; superseded by current physically identified X4 leftmost.",
+    "raw_to_physical_left_to_right_indices": [
+      3,
+      2,
+      1,
+      0
+    ],
+    "physical_order_motion_commands_sent": 0,
+    "placement": "approximately between the four wheels, not ahead of the front axle; exact offsets not measured",
+    "white_levels": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "white_reference": {
+      "user_confirmed_setup": "all four probes above white paper at normal driving height",
+      "unique_fresh_samples": 22,
+      "counts_for_level_zero_per_channel": [
+        22,
+        22,
+        22,
+        22
+      ],
+      "evidence_file": "outputs/RBE201TC_RESUME_20261104/line_white_reference_20261104T114543_45c11c.json"
+    },
+    "black_levels": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "black_reference_status": "user_confirmed_all_four_black_zero_after_correcting_tape_coverage_20261111",
+    "black_reference_source": "direct_user_physical_feedback; prior host capture only covered X1-X3, not treated as all-black evidence",
+    "background_surface": "bare_dorm_floor",
+    "background_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "background_reference_file": "outputs/RBE201TC_LINE_CALIBRATION_20261111/bare_floor_20261111T004535_9a902421.json",
+    "polarity_verified": true,
+    "polarity_verification_basis": "27 fresh host samples for bare floor; user reports black=0 for all four after fixing coverage",
+    "verification_scope": "Current left outer X4 independently matched to five live raw1110 samples and user physical forward-view confirmation. Remaining order follows archived full sweep; no new four-position sweep or powered motion performed.",
+    "physical_order_evidence_superseded": [
+      "outputs/RBE201TC_RIGHT_ANGLE_20261111/integration/round3/stationary_physical_rightmost_201452.json",
+      "outputs/RBE201TC_RIGHT_ANGLE_20261111/integration/round3/physical_order_sweep_201743.json"
+    ],
+    "physical_order_evidence": [
+      "outputs/RBE201TC_LINE_DISPLAY_CHECK_20261113/leftmost_black_samples.json",
+      "User confirms leftmost from vehicle rear looking in forward travel direction.",
+      "Older complete stationary sweep supports remaining channel order."
+    ]
+  },
+  "motor_hardware_20261112": {
+    "source": "direct_user_feedback",
+    "motor_body": "yellow plastic TT",
+    "connected_wires_per_motor": 2,
+    "encoder_feedback_connected": false,
+    "rated_motor_voltage_confirmed": false,
+    "driver_supply_fresh_readback_v": 12.2,
+    "pwm_type4_trial": "User reports no wheels move at PWM80 and PWM200; host also recorded220. Cause not established. Archived firmware adds existing deadzone1600 automatically. Do not add deadzone a second time.",
+    "current_restore_reason": "Restore prior type1/spd interface solely as last known physically working compatibility baseline; no valid closed-loop wheel speed claim. Short-command startup mismatch remains unresolved."
+  }
+}

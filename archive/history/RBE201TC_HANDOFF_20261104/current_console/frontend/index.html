@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light"><title>RDK · 传感器工作台</title>
+<link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script><script src="/control.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到监控内容</a>
+<svg class="svg-library" aria-hidden="true"><defs>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="m18 9 4-2v10l-4-2"/></symbol>
+<symbol id="i-temp" viewBox="0 0 24 24"><path d="M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0ZM12 8v9m6-10h3m-3 4h2"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2S4 10 4 15a8 8 0 0 0 16 0C20 10 12 2 12 2ZM8 15a4 4 0 0 0 4 4"/></symbol>
+<symbol id="i-line" viewBox="0 0 24 24"><path d="M4 3v18m16-18v18M12 3v3m0 4v4m0 4v3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="16" cy="17" r="3"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M6.5 6a8 8 0 0 1 13 4M4.5 14a8 8 0 0 0 13 4"/></symbol>
+<symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/></symbol>
+</defs></svg>
+<aside class="rail" aria-label="主导航">
+<a class="logo" href="#main" aria-label="RDK首页">R<span>·</span></a>
+<nav><a class="nav-link selected" href="#main"><svg><use href="#i-grid"/></svg><span>概览</span></a><a class="nav-link" href="#camera-panel"><svg><use href="#i-camera"/></svg><span>相机</span></a><a class="nav-link" href="#line-panel"><svg><use href="#i-line"/></svg><span>循线</span></a></nav>
+<div class="rail-bottom"><i></i>RBE<br>201TC</div>
+</aside>
+<div class="workspace">
+<header class="topbar"><div class="breadcrumb">实验室 <span>/</span> RDK X5 <span>/</span> <strong>实时监控</strong></div><div class="top-actions"><span id="connection" class="badge waiting" role="status">正在连接</span><button id="settings" class="icon-button" type="button" aria-label="连接设置" aria-expanded="false" aria-controls="settings-panel"><svg><use href="#i-settings"/></svg></button></div></header>
+<main id="main">
+<section id="settings-panel" class="settings-panel" hidden><h2>连接设置</h2><p>通过当前页面访问设备。令牌只保留在本页内存中。</p><form id="settings-form" autocomplete="off"><label for="token">访问令牌</label><div class="token-row"><input id="token" type="password" autocomplete="off" placeholder="未开启认证时留空"><button type="submit" class="primary">应用</button><button id="clear-token" type="button">清除</button></div></form></section>
+<section class="page-heading"><div><div class="eyebrow">ROBOT SENSOR STUDIO</div><h1>看见机器人周围的一切<span class="title-dot">.</span></h1><p id="host-address">相机、环境与地面信号，在这里一起查看。</p></div><div class="page-controls"><button id="refresh" class="refresh-button" type="button"><svg><use href="#i-refresh"/></svg><span>刷新</span></button><button id="pause" type="button" aria-pressed="false">暂停更新</button></div></section>
+<div id="notice" class="notice" role="status">正在连接开发板，等待真实读数…</div>
+<section id="drive-panel" class="panel drive-panel" aria-labelledby="drive-title">
+<div class="panel-header"><div><h2 id="drive-title">车轮控制</h2><p class="drive-subtitle">直接按住方向键 / W A S D，按多久转多久，松开停车。</p></div><span id="drive-status" class="sensor-badge" role="status">正在连接</span></div>
+<div class="drive-layout"><div class="drive-instructions">
+<div class="drive-actions"><button id="drive-stop" class="emergency-stop">■ 急停 <kbd>空格</kbd></button></div>
+<label class="drive-speed" for="drive-speed">测试速度 <strong id="drive-speed-value">200</strong><input id="drive-speed" type="range" min="80" max="220" step="10" value="200"></label>
+<p id="drive-message" class="drive-message" role="status">正在连接，连接后直接按方向键。</p>
+<p class="drive-safety">失去焦点、关闭页面或控制心跳超时会尝试停车。若轮子仍转，立即断开电机电源。</p>
+</div><div class="drive-pad" aria-label="按住控制方向"><button data-drive="forward" class="drive-up" disabled aria-label="按住前进">↑<span>前进</span></button><button data-drive="left" class="drive-left" disabled aria-label="按住左转">←<span>左转</span></button><button data-drive="backward" class="drive-down" disabled aria-label="按住后退">↓<span>后退</span></button><button data-drive="right" class="drive-right" disabled aria-label="按住右转">→<span>右转</span></button></div></div>
+<div class="wheel-test"><span>逐轮测试 · 按住</span><button data-drive="m1" disabled>M1</button><button data-drive="m2" disabled>M2</button><button data-drive="m3" disabled>M3</button><button data-drive="m4" disabled>M4</button><span id="drive-pwm" class="drive-pwm">M1 0 · M2 0 · M3 0 · M4 0</span></div>
+<p class="drive-mapping">差速转向，无转向轴。课程默认：左侧 M1/M2，右侧 M3/M4；左右键让两侧反向旋转。通道位置与正反方向待你实测。按住多久就转多久，松开停车。</p>
+</section>
+<section class="sensor-grid" aria-label="三个传感器">
+<article id="camera-panel" class="panel camera-panel">
+<div class="panel-header"><div class="panel-title"><span class="icon-tile neutral"><svg><use href="#i-camera"/></svg></span><div><h2>相机视野</h2><p>MIPI CAMERA</p></div></div><span id="camera-status" class="sensor-badge">等待画面</span></div>
+<div id="camera-stage" class="camera-stage"><img id="camera-image" alt="RDK摄像头实时画面" hidden><div id="camera-placeholder" class="camera-placeholder"><span class="camera-outline"><svg><use href="#i-camera"/></svg></span><strong>正在唤醒摄像头</strong><p id="camera-message">成功采集后，这里会显示真实画面。</p></div><div id="camera-overlay" class="camera-overlay" hidden>画面已暂停</div><span id="camera-live" class="camera-live" hidden><i></i> LIVE</span><span id="camera-frame-age" class="camera-frame-age">尚无画面</span></div>
+<div class="camera-footer"><span><i class="tiny-dot"></i><span id="camera-interface">CSI 1 · 等待采集</span></span><span id="camera-resolution">— × —</span><span id="camera-rate">— 帧/秒</span></div>
+</article>
+<article class="panel metric-panel temperature-panel"><div class="metric-heading"><span class="icon-tile orange"><svg><use href="#i-temp"/></svg></span><h2>环境温度</h2><span id="temperature-status" class="sensor-badge">等待</span></div><div class="reading"><strong id="temperature-value">—</strong><span>°C</span></div><div class="metric-bottom"><span id="temperature-note">DHT11 · 尚无有效读数</span><svg id="temperature-chart" class="sparkline" viewBox="0 0 120 32" aria-label="近期温度趋势"><path/></svg></div></article>
+<article class="panel metric-panel humidity-panel"><div class="metric-heading"><span class="icon-tile blue"><svg><use href="#i-drop"/></svg></span><h2>相对湿度</h2><span id="humidity-status" class="sensor-badge">等待</span></div><div class="reading"><strong id="humidity-value">—</strong><span>%RH</span></div><div class="metric-bottom"><span id="humidity-note">DHT11 · 尚无有效读数</span><svg id="humidity-chart" class="sparkline" viewBox="0 0 120 32" aria-label="近期湿度趋势"><path/></svg></div></article>
+<article id="line-panel" class="panel line-panel"><div class="panel-header"><div class="panel-title"><span class="icon-tile teal"><svg><use href="#i-line"/></svg></span><div><h2>地面循线</h2><p>4-CHANNEL TRACKING</p></div></div><span id="line-status" class="sensor-badge">等待信号</span></div><div id="line-sensors" class="probe-row" aria-label="四路循线输入"></div><div class="line-footer"><span id="line-message">每个圆圈对应一个探头的真实电平。</span><span class="legend"><i></i>高电平 <i></i>低电平</span></div><p class="calibration-note">显示X1–X4通道顺序；实际左右位置与黑白极性尚待实物核对。读到电平不等于已验证循线。</p></article>
+<article class="panel summary-panel"><div class="panel-header"><h2>设备连接</h2><span id="sensor-count" class="count-tag">0 / 3</span></div><div class="sensor-checks"><div><span class="check-name"><svg><use href="#i-camera"/></svg>相机</span><span id="check-camera">正在连接</span></div><div><span class="check-name"><svg><use href="#i-temp"/></svg>温湿度</span><span id="check-dht">正在连接</span></div><div><span class="check-name"><svg><use href="#i-line"/></svg>循线模块</span><span id="check-line">正在连接</span></div></div><p id="updated" class="update-note">等待首次更新</p><p id="clock-warning" class="clock-warning" hidden>设备日期异常，采集记录前请先校时。</p></article>
+</section>
+<section class="system-strip" aria-labelledby="resources-title"><div class="system-label"><svg><use href="#i-chip"/></svg><div><h2 id="resources-title">开发板状态</h2><span id="host-kind">身份待确认</span></div></div><div id="resources" class="resources"></div></section>
+<details class="technical"><summary>调试详情 <span>接口、编码器与原始数据</span></summary><div class="technical-content"><p id="snapshot-label">暂无数据</p><table class="device-table"><caption>设备监控与接口状态</caption><thead><tr><th>设备</th><th>接口</th><th>状态</th></tr></thead><tbody id="devices"></tbody></table><div class="encoder-heading"><h3>编码器原始计数</h3><span id="encoder-status">未启用</span></div><div id="encoders" class="encoders"></div><p id="encoder-age">未开启串口</p><p>电机测试通过独立的按住式控制接口发送指令。节点发现、已发送指令与实际运动验证分别记录。</p><details class="raw-detail"><summary>原始响应 /api/v1/status</summary><pre id="raw" tabindex="0">尚无响应</pre></details></div></details>
+<footer><span>RBE201TC · 机器人实验工作台</span><span>真实采样 · 按住式车轮测试</span></footer>
+<noscript><p class="notice attention">请启用JavaScript以查看实时读数。</p></noscript>
+</main></div>
+</body></html>

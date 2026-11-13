@@ -1,0 +1,272 @@
+{
+  "archive_sha256": "edfb23cb0ff28450248d4355ae12cda3cf34248495c418dff646d949bd77e22b",
+  "execution": "real archived Thumb instructions under Unicorn; SRAM initialized from saved PID/deadzone settings; zero encoder feedback injected",
+  "not_proven": "Current device flash equality, real timing, GPIO pin mux, clocks, voltage and wheel response are NOT emulated",
+  "zero_feedback": [
+    {
+      "pid_iterations": 1,
+      "stored_outputs": [
+        272.0,
+        272.0,
+        54.400001525878906,
+        54.400001525878906
+      ]
+    },
+    {
+      "pid_iterations": 10,
+      "stored_outputs": [
+        280.0,
+        280.0,
+        56.00001525878906,
+        56.00001525878906
+      ]
+    },
+    {
+      "pid_iterations": 50,
+      "stored_outputs": [
+        760.0,
+        760.0,
+        152.0,
+        152.0
+      ]
+    },
+    {
+      "pid_iterations": 100,
+      "stored_outputs": [
+        1360.0,
+        1360.0,
+        271.99969482421875,
+        271.99969482421875
+      ]
+    },
+    {
+      "pid_iterations": 200,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        511.99908447265625,
+        511.99908447265625
+      ]
+    },
+    {
+      "pid_iterations": 400,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        992.0039672851562,
+        992.0039672851562
+      ]
+    },
+    {
+      "pid_iterations": 600,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        1472.0087890625,
+        1472.0087890625
+      ]
+    },
+    {
+      "pid_iterations": 800,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        1952.013671875,
+        1952.013671875
+      ]
+    },
+    {
+      "pid_iterations": 1000,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        2000.0,
+        2000.0
+      ]
+    },
+    {
+      "pid_iterations": 1200,
+      "stored_outputs": [
+        2000.0,
+        2000.0,
+        2000.0,
+        2000.0
+      ]
+    }
+  ],
+  "after_switch_before_pid": [
+    2000.0,
+    2000.0,
+    2000.0,
+    2000.0
+  ],
+  "after_switch_after_pid": [
+    1794.4000244140625,
+    1794.4000244140625,
+    2000.0,
+    2000.0
+  ],
+  "pwm_register_writes": [
+    {
+      "address": "0x40012c38",
+      "size": 2,
+      "value": 1800
+    },
+    {
+      "address": "0x40012c3c",
+      "size": 2,
+      "value": 0
+    },
+    {
+      "address": "0x40013434",
+      "size": 2,
+      "value": 1800
+    },
+    {
+      "address": "0x40013438",
+      "size": 2,
+      "value": 0
+    },
+    {
+      "address": "0x40012c40",
+      "size": 2,
+      "value": 1640
+    },
+    {
+      "address": "0x40012c34",
+      "size": 2,
+      "value": 0
+    },
+    {
+      "address": "0x4001343c",
+      "size": 2,
+      "value": 0
+    },
+    {
+      "address": "0x40013440",
+      "size": 2,
+      "value": 1640
+    }
+  ],
+  "pid_enabled_after_pwm": 0,
+  "after_1000_pwm_commands": [
+    [
+      1800,
+      0
+    ],
+    [
+      1800,
+      0
+    ],
+    [
+      1640,
+      0
+    ],
+    [
+      0,
+      1640
+    ]
+  ],
+  "opposite_arc_pwm_registers": [
+    [
+      1640,
+      0
+    ],
+    [
+      1640,
+      0
+    ],
+    [
+      1800,
+      0
+    ],
+    [
+      0,
+      1800
+    ]
+  ],
+  "pwm_zero_stop_registers": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "uart_command_body_parse": [
+    {
+      "motor_type": 1,
+      "command_body": "pwm:200,200,40,40",
+      "parsed": [
+        200,
+        200,
+        40,
+        40
+      ],
+      "timer_compare_magnitudes": [
+        1800,
+        1800,
+        1640,
+        1640
+      ]
+    },
+    {
+      "motor_type": 4,
+      "command_body": "pwm:200,200,40,40",
+      "parsed": [
+        200,
+        200,
+        40,
+        40
+      ],
+      "timer_compare_magnitudes": [
+        1800,
+        1800,
+        1640,
+        1640
+      ]
+    },
+    {
+      "motor_type": 4,
+      "command_body": "pwm:40,40,200,200",
+      "parsed": [
+        40,
+        40,
+        200,
+        200
+      ],
+      "timer_compare_magnitudes": [
+        1640,
+        1640,
+        1800,
+        1800
+      ]
+    },
+    {
+      "motor_type": 4,
+      "command_body": "pwm:0,0,0,0",
+      "parsed": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "timer_compare_magnitudes": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}
