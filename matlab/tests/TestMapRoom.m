@@ -494,7 +494,7 @@ end
 function rows = read_output(result, filename)
 % Import audit CSV text explicitly, just as the production importer does.
 path = fullfile(result.output_directory, filename);
-options = detectImportOptions(path, 'VariableNamingRule', 'preserve');
+options = detectImportOptions(path, 'VariableNamingRule', 'preserve', 'Delimiter', ',');
 options = setvartype(options, options.VariableNames, 'string');
 rows = readtable(path, options);
 end
