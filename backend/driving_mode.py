@@ -67,7 +67,7 @@ class DrivingMode:
                     raise ControlError('autonomy_not_configured')
                 if self.mode != 'automatic':
                     raise ControlError('automatic_mode_required')
-                owner = self.follower.start(speed=data.get('speed', 20))
+                owner = self.follower.start(speed=data['speed']) if 'speed' in data else self.follower.start()
                 # The executor is only armed here. A first valid, explicit
                 # owner heartbeat is required before it can issue motion.
                 return {**self.snapshot(), 'autonomy_session': owner}

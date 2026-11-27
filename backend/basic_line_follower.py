@@ -70,6 +70,7 @@ def _position_gap_pattern(values):
 class BasicLineFollower:
     period = .02
     autonomy_speeds = (10, 20, 40)
+    maximum_start_speed = 220
     max_sensor_age = .4
     owner_timeout = .8
     control_policy = 'four_digital_continuous_turn_v1'
@@ -235,7 +236,7 @@ class BasicLineFollower:
         return self._snapshot_locked()
 
     def start(self, speed=20):
-        if type(speed) is not int or not 10 <= speed <= 220:
+        if type(speed) is not int or not 10 <= speed <= self.maximum_start_speed:
             raise ValueError('invalid_speed')
         with self._lock:
             if self._closed:
@@ -262,7 +263,7 @@ class BasicLineFollower:
             self._owner = secrets.token_urlsafe(32)
             self._motor_session = session
             self._owner_seq = self._motor_seq = -1
-            self._owner_time, self._speed = now, min(speed, MAX_CORRECTION_SPEED)
+            self._owner_time, self._speed = now, min(speed, self.max_correction_speed)
             self._sample_mono = self._sample_count = None
             # Preserve last raw values, trace and last failure across explicit
             # stop/start. New session sample ordering starts independently.

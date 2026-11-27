@@ -45,7 +45,7 @@ flowchart LR
 
 `deploy/start_monitor.py`为板上服务启动入口，`deploy/imu_route.json`选择track_imu。只运行`backend/server.py`且不传硬件参数，可在电脑离线预览。
 
-`tools/run_commissioned_mission.py`是另一套任务入口，不是当前控制台自动驾驶。旧80–220速度配置不适用于当前最高20路线。
+`tools/run_commissioned_mission.py`使用独立的站点任务入口，仍采用 80–220 的速度配置。控制台的 PWM 600 自主循线通过 `TrackImuFollower` 启动。
 
 ## 历史与当前
 

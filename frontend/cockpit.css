@@ -18,3 +18,5 @@ html,body{background:#000}.console-header h1{font-size:30px;letter-spacing:2px;f
 .auto-speed-switch{display:flex;width:min(100%,280px);gap:4px;padding:4px;border:1px solid #25272a;border-radius:10px;background:#111214}.auto-speed-switch button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:8px 9px;border:0;border-radius:6px;color:#93979d;font-size:12px;background:transparent}.auto-speed-switch strong{font-size:14px;font-weight:500}.auto-speed-switch button[aria-pressed=true]{background:#303236;color:#fff;box-shadow:0 1px 5px #0004}.auto-speed-switch button:disabled{opacity:.5}
 
 .heading-row{gap:18px}.heading-row>div{flex:1}.heading-row .reading{font-variant-numeric:tabular-nums}.heading-row button{padding:8px 15px;min-height:34px;border:1px solid #303236;border-radius:7px;background:transparent;color:#bfc2c6;font-size:12px}.heading-row button:hover:not(:disabled){border-color:#62666b;color:#fff}.heading-row button:disabled{opacity:.4}
+
+#manual-pwm-gears{width:100%}#manual-pwm-gears button{flex-direction:column;gap:2px;min-width:0;min-height:38px;padding:4px 3px;white-space:nowrap}

@@ -15,6 +15,7 @@ class ImuLineFollower(BasicLineFollower):
     angle_tolerance = 2.0
     angle_stable_seconds = .12
     angle_stable_change = .5
+    turn_brake_lead_deg = 15.0
     fine_speed_limit = 10
     white_confirmation_samples = 10
     turn_motion_window_s = .3
@@ -167,7 +168,7 @@ class ImuLineFollower(BasicLineFollower):
     def _angle_pair_locked(self, heading):
         error = self.target_heading - heading
         if self.angle_stage == 'coarse':
-            if self.turn_sign * error > 15:
+            if self.turn_sign * error > max(self.turn_brake_lead_deg, self.angle_tolerance):
                 return self._powered_turn_pair_locked(heading, self.turn_sign, self._speed,
                     'imu_turn_left' if self.turn_sign > 0 else 'imu_turn_right')
             # Stop the main turn and clear its output before measuring the endpoint.

@@ -38,7 +38,10 @@ class WheelControl {
   emit(state) {
     // An observed GET or motor session must never become an autonomous ownership credential.
     const {autonomy_session:ignored,...observed}=state;
-    this.state={...this.state,...observed,...(Object.hasOwn(observed,'outputs')?{received_at:performance.now()}: {})};this.change(this.state);
+    this.state={...this.state,...observed,...(Object.hasOwn(observed,'outputs')?{received_at:performance.now()}: {})};
+    const gears=this.state.autonomy?.speed_gears;
+    if(gears?.length&&!gears.includes(this.autoSpeed))this.autoSpeed=gears[0];
+    this.change(this.state);
   }
   async request(data) {
     const abort=new AbortController(), timeout=setTimeout(()=>abort.abort(),800);
@@ -167,7 +170,7 @@ class WheelControl {
     try {await starting;}finally{if(this.autoStarting===starting){this.autoStarting=null;this.emit({});}}
   }
   setAutonomySpeed(speed) {
-    if(![20].includes(speed))return;
+    if(!(this.state.autonomy?.speed_gears || [20]).includes(speed))return;
     this.autoSpeed=speed;this.emit({});
     if(this.autoSession&&this.autoTimer!=null){
       clearTimeout(this.autoTimer);this.autoTimer=null;
@@ -212,7 +215,10 @@ if(typeof module!=='undefined')module.exports={WheelControl,DRIVE_KEYS,direction
 
 function mountWheelControl() {
   const $=id=>document.getElementById(id), buttons=[...document.querySelectorAll('[data-drive]')];
-  const autoSpeeds=[20].map(speed=>[$('auto-speed-'+speed),speed]).filter(([button])=>button);
+  const speedSlider=$('drive-speed');
+  const pwmGearPanel=$('manual-pwm-gears'), pwmButtons=[...(pwmGearPanel?.querySelectorAll?.('button')??[])];
+  const autoLow=$('auto-speed-20');
+  let manualPwmSpeed=550;
   const heldKeys=new Set();let heldPointer=null;
   const clearHeld=()=>{heldKeys.clear();heldPointer=null;};
   const labels={loading:'正在连接',arming:'正在连接电机',disabled:'电机接口未开启',switching:'切换中',stopped:'就绪',armed:'就绪',
@@ -237,8 +243,26 @@ function mountWheelControl() {
     $('autonomy-status').textContent=autoStatus;
     $('auto-start').disabled=!control.canStartAutonomy();
     const selectedSpeed=state.autonomy?.running&&!control.autoSession?state.autonomy.speed:control.autoSpeed;
-    autoSpeeds.forEach(([button,speed])=>{button.setAttribute('aria-pressed',String(speed===selectedSpeed));button.disabled=!!control.switching||!state.enabled||!!(state.autonomy?.running&&!control.autoSession);});
-    $('drive-speed').disabled=automatic||control.switching;
+    if(autoLow){
+      const number=autoLow.querySelector?.('strong');
+      if(number)number.textContent=selectedSpeed;
+      autoLow.disabled=!!control.switching||!state.enabled||!!(state.autonomy?.running&&!control.autoSession);
+    }
+    if(Number.isInteger(state.manual_speed_max)){
+      speedSlider.max=String(state.manual_speed_max);
+      $('drive-speed-value').textContent=speedSlider.value;
+    }
+    const pwm=state.command_mode==='pwm';
+    if(pwmButtons.length){
+      pwmGearPanel.hidden=!pwm;
+      speedSlider.hidden=pwm;
+      $('manual-speed-label').hidden=pwm;
+      pwmButtons.forEach(button=>{
+        button.disabled=automatic||control.switching||!state.enabled;
+        button.setAttribute('aria-pressed',String(Number(button.value)===manualPwmSpeed));
+      });
+    }
+    speedSlider.disabled=automatic||control.switching;
     const owned=state.armed&&!!control.session;
     $('drive-status').textContent=automatic?autoStatus:state.armed&&!owned?'其他端控制中':labels[state.state]||'等待控制';
     $('drive-status').className='sensor-badge '+(state.state==='driving'?'live':state.state==='fault'?'error':'');
@@ -252,11 +276,24 @@ function mountWheelControl() {
   $('mode-manual').addEventListener('click',()=>{clearHeld();control.setMode('manual');});
   $('mode-auto').addEventListener('click',()=>{clearHeld();control.setMode('automatic');});
   $('auto-start').addEventListener('click',()=>{if(!document.hidden){clearHeld();control.startAutonomy();}});
-  autoSpeeds.forEach(([button,speed])=>button.addEventListener('click',()=>{if(!document.hidden&&!button.disabled)control.setAutonomySpeed(speed);}));
+  autoLow?.addEventListener('click',()=>{if(!document.hidden&&!autoLow.disabled)control.setAutonomySpeed(control.autoSpeed);});
   $('auto-stop').addEventListener('click',()=>{clearHeld();control.stop();});
   $('drive-stop').addEventListener('click',()=>{clearHeld();control.stop();});
-  $('drive-speed').addEventListener('input',()=>{clearHeld();control.release();$('drive-speed-value').textContent=$('drive-speed').value;});
-  const speed=()=>Number($('drive-speed').value);
+  const speed=()=>control.state.command_mode==='pwm'&&pwmButtons.length?manualPwmSpeed:Number(speedSlider.value);
+  pwmButtons.forEach(button=>button.addEventListener('click',()=>{
+    if(document.hidden||button.disabled)return;
+    manualPwmSpeed=Number(button.value);
+    if(control.active&&(heldKeys.size||heldPointer!==null))control.start(control.active,manualPwmSpeed);
+    else control.emit({});
+  }));
+  speedSlider.addEventListener('input',()=>{
+    $('drive-speed-value').textContent=speedSlider.value;
+    if(control.state.command_mode==='pwm'&&control.active&&(heldKeys.size||heldPointer!==null)){
+      control.start(control.active,speed());
+    } else {
+      clearHeld();control.release();
+    }
+  });
   const updateKeys=()=>{const direction=directionForKeys(heldKeys);if(direction)control.start(direction,speed());else control.release();};
   for(const button of buttons){
     button.addEventListener('pointerdown',e=>{

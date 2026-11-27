@@ -13,8 +13,10 @@
     "right",
     "right",
     "left",
-    "left"
+    "left",
+    "right"
   ],
+  "final_sharp_right": true,
   "turn_offset_seconds": 0.0,
   "yaw_left_sign": 1,
   "controller": "track_imu"

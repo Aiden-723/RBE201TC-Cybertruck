@@ -122,7 +122,8 @@ class RouteTests(unittest.TestCase):
 
     def test_route_file_exactly_matches_user_order(self):
         cfg=json.loads((Path(__file__).resolve().parents[2]/'deploy/imu_route.json').read_text())
-        self.assertEqual(''.join('左' if x=='left' else '右' for x in cfg['turns']),'左左右右左左右右左左右右左左')
+        self.assertEqual(''.join('左' if x=='left' else '右' for x in cfg['turns']),'左左右右左左右右左左右右左左右')
+        self.assertTrue(cfg['final_sharp_right'])
         self.assertEqual(cfg['turn_offset_seconds'],0)
 
     def test_partial_line_after_turn_is_followed_but_cannot_trigger_next_turn(self):

@@ -9,17 +9,25 @@ class ControlError(Exception):
     pass
 
 
-def mix(direction, speed):
+MANUAL_MIN_SPEED = 20
+MANUAL_STANDARD_MIN_SPEED = 80
+MANUAL_SPEED_MAX = 220
+MANUAL_PWM_GEARS = (550, 620, 700)
+
+
+def mix(direction, speed, *, maximum=MANUAL_SPEED_MAX):
     if not isinstance(direction, str):
         raise ControlError('invalid_direction')
-    if type(speed) is not int or not 80 <= speed <= 220:
+    if type(speed) is not int or not MANUAL_MIN_SPEED <= speed <= maximum:
         raise ControlError('speed_out_of_range')
     # Course line_follower.py convention; physical wiring is still unverified.
     patterns = {'forward': (1, 1, 1, 1), 'backward': (-1, -1, -1, -1),
                 'left': (-1, -1, 1, 1), 'right': (1, 1, -1, -1)}
     if direction in patterns:
         return tuple(n * speed for n in patterns[direction])
-    inner = max(20, speed // 5)
+    inner = speed // 5
+    if speed >= MANUAL_STANDARD_MIN_SPEED:
+        inner = max(20, inner)
     # Forward arcs keep all four wheels forward. A 5:1 command ratio gives
     # a pronounced yaw without STOP, zero inner output or counter-rotation.
     arcs = {'forward_right': (speed, speed, inner, inner),
@@ -100,6 +108,7 @@ class SerialPWM:
 class MotorControl:
     lease_seconds = 0.45
     arm_idle_seconds = 60.0
+    unchanged_target_refresh_seconds = .10
     startup_boost_speed = 200
     startup_boost_seconds = .2
 
@@ -113,6 +122,7 @@ class MotorControl:
         self._boost_until = None
         self.transport = transport
         self.mode = mode
+        self.manual_speed_max = MANUAL_PWM_GEARS[-1] if mode == 'pwm' else MANUAL_SPEED_MAX
         self.clock = clock
         self.lock = threading.RLock()
         self.session = None
@@ -184,13 +194,13 @@ class MotorControl:
 
     def _submit_targets_locked(self, values, *, continuous=False, allow_boost=True):
         changed = values != self.requested_values
-        # Manual actions retain the user's 200 / .2s behavior. Autonomous
-        # same-direction magnitude adjustments are running corrections, not starts.
+        # Boost-enabled manual actions retain the user's 200 / .2s behavior.
+        # Autonomous same-direction adjustments are running corrections.
         restart = (any(new and (old == 0 or old * new < 0)
                        for old, new in zip(self.requested_values, values))
                    if continuous else changed)
-        boosting = (allow_boost and self.startup_boost_enabled and any(values) and
-                    (restart or (self._boost_until is not None and self.clock() < self._boost_until)))
+        continuing_boost = self._boost_until is not None and self.clock() < self._boost_until
+        boosting = allow_boost and self.startup_boost_enabled and any(values) and (restart or continuing_boost)
         # Preserve arc ratios during startup too: equal +/-200 would briefly
         # turn a forward+steer command into a zero-travel pivot.
         proportional = continuous or len({abs(value) for value in values if value}) > 1
@@ -246,6 +256,7 @@ class MotorControl:
             return {'enabled': True, 'armed': self.session is not None,
                     'state': 'fault' if self.fault else 'driving' if any(self.values) else 'armed' if self.session else 'stopped',
                     'outputs': list(self.values), 'command_mode': self.mode,
+                    'manual_speed_max': self.manual_speed_max,
                     'requested_outputs': list(self.requested_values),
                     'startup_boost_enabled': self.startup_boost_enabled,
                     'startup_boost_speed': self.startup_boost_speed,
@@ -297,7 +308,8 @@ class MotorControl:
                 raise ControlError('not_armed')
             if type(seq) is not int or seq <= self.seq or seq > 2**53 - 1:
                 raise ControlError('stale_command')
-            values = mix(data['direction'], data['speed']) if action == 'drive' else None
+            values = (mix(data['direction'], data['speed'], maximum=self.manual_speed_max)
+                      if action == 'drive' else None)
             self.seq = seq
             if action == 'release':
                 self._stop_locked('key_released')
@@ -307,21 +319,24 @@ class MotorControl:
                     self._stop_locked('direction_change')
                     if self.fault:
                         raise ControlError('serial_fault_restart_required')
-                self._submit_targets_locked(values)
+                allow_boost = self.mode != 'pwm' or data['speed'] < self.startup_boost_speed
+                self._submit_targets_locked(values, allow_boost=allow_boost)
                 now = self.last_drive_time
                 self.deadline = now + self.lease_seconds
                 self.reason = 'command_sent'
             self.idle_deadline = self.clock() + self.arm_idle_seconds
             return self.snapshot()
 
-    def drive_sides(self, session, seq, left, right, *, precision=False):
+    def drive_sides(self, session, seq, left, right, *, precision=False, coalesce_unchanged=False):
         """Internal autonomous bridge; shares the existing owner, lease and wire.
 
         Not an HTTP command: DrivingMode alone arbitrates automatic ownership.
         Existing manual command/mix and serial configuration remain unchanged.
         Values are controller setpoints in this instance's existing mode, not
         measured wheel speed, and never change firmware configuration.
-        precision suppresses startup assist only for internal angle corrections.
+        precision suppresses startup assist. coalesce_unchanged lets the
+        tracking loop authorize the same target without waiting for UART on
+        every sample. A changed target or stop still goes to the wire at once.
         """
         with self.lock:
             self._check_locked()
@@ -332,7 +347,7 @@ class MotorControl:
                 raise ControlError('not_armed')
             if type(seq) is not int or seq <= self.seq or seq > 2**53 - 1:
                 raise ControlError('stale_command')
-            if any(type(value) is not int or not -220 <= value <= 220 for value in (left, right)):
+            if any(type(value) is not int or abs(value) > self.manual_speed_max for value in (left, right)):
                 raise ControlError('invalid_sides')
             if type(precision) is not bool:
                 raise ControlError('invalid_precision_mode')
@@ -344,9 +359,15 @@ class MotorControl:
                 self._stop_locked('direction_change')
                 if self.fault:
                     raise ControlError('serial_fault_restart_required')
-            # Endpoint corrections must not restart the normal 200/.2s assist.
-            self._submit_targets_locked(values, continuous=True, allow_boost=not precision)
-            now = self.last_drive_time
+            now = self.clock()
+            target_already_sent = (
+                coalesce_unchanged and values == self.values == self.requested_values
+                and self._boost_until is None and self.last_drive_time is not None
+                and now - self.last_drive_time < self.unchanged_target_refresh_seconds
+            )
+            if not target_already_sent:
+                self._submit_targets_locked(values, continuous=True, allow_boost=not precision)
+                now = self.last_drive_time
             self.deadline = now + self.lease_seconds
             self.idle_deadline = now + self.arm_idle_seconds
             self.reason = 'autonomous_command_sent'

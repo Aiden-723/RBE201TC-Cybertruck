@@ -14,11 +14,11 @@ def arguments(port=PORT):
         present=stat.S_ISCHR(Path(port).stat().st_mode)
     except FileNotFoundError:
         present=False
-    if present:args+=['--motor-port',port,'--motor-mode','speed']
+    if present:args+=['--motor-port',port,'--motor-mode','pwm']
     args+=['--imu-port','/dev/rbe201tc-imu','--route-config','deploy/imu_route.json']
     return args
 
 if __name__=='__main__':
     args=arguments()
-    print('Monitor mode: '+('speed control' if '--motor-port' in args else 'sensor only'),flush=True)
+    print('Monitor mode: '+('PWM control' if '--motor-port' in args else 'sensor only'),flush=True)
     os.execv(sys.executable,args)

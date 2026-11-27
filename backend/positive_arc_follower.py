@@ -172,12 +172,15 @@ class PositiveArcFollower(ImuLineFollower):
             self._center_samples = 0
 
         if self.phase == 'reverse':
-            if self.reverse_started is None or now - self.reverse_started < self.reverse_seconds:
+            if self.reverse_seconds > 0 and (
+                    self.reverse_started is None or now - self.reverse_started < self.reverse_seconds):
                 return -self.reverse_speed, -self.reverse_speed, 'corner_reverse', 0.0
             self.turn_started = now
             self.turn_entry_heading = heading
             self.phase = 'turn'
             self._reset_angle_locked()
             self.angle_stage = 'coarse'
-        # Probe changes cannot end an IMU turn before its angle is verified.
+        return self._turn_pair_locked(values, fresh, heading)
+
+    def _turn_pair_locked(self, values, fresh, heading):
         return self._angle_pair_locked(heading)

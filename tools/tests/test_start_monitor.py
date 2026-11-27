@@ -14,7 +14,7 @@ class StartupTests(unittest.TestCase):
     def test_real_character_device_is_passed_without_opening_or_moving_it(self):
         args=startup.arguments('/dev/null')
         self.assertEqual(args[args.index('--motor-port')+1],'/dev/null')
-        self.assertEqual(args[args.index('--motor-mode')+1],'speed')
+        self.assertEqual(args[args.index('--motor-mode')+1],'pwm')
         self.assertEqual(args[args.index('--imu-port')+1],'/dev/rbe201tc-imu')
         self.assertEqual(args[args.index('--route-config')+1],'deploy/imu_route.json')
     def test_missing_port_or_regular_file_cannot_enable_motor_control(self):

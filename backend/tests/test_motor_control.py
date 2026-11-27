@@ -97,10 +97,23 @@ class MotorTests(unittest.TestCase):
         session = self.arm()
         with self.assertRaises(ControlError):
             self.arm()
-        for speed in (-1000, 0, 79, 221, 1000, True, 130.0, '130'):
+        for speed in (-1000, 0, 19, 701, 1000, True, 130.0, '130'):
             with self.assertRaises(ControlError):
                 self.drive(session, speed=speed)
         self.assertEqual(self.motor.snapshot()['pwm'], [0]*4)
+
+    def test_pwm_manual_speed_can_be_changed_without_releasing(self):
+        wire=FakeSerial()
+        motor=MotorControl(wire,clock=lambda:self.now,mode='pwm',startup_boost=True)
+        self.addCleanup(motor.close)
+        owner=motor.command({'action':'arm'})['session']
+        self.assertEqual(motor.snapshot()['manual_speed_max'],700)
+        wire.packets.clear()
+        for seq,power in enumerate((700,500,300)):
+            motor.command(dict(action='drive',session=owner,seq=seq,direction='forward',speed=power))
+        self.assertEqual(wire.packets,[b'$pwm:700,700,700,700#',b'$pwm:500,500,500,500#',b'$pwm:300,300,300,300#'])
+        motor.command(dict(action='release',session=owner,seq=3))
+        self.assertEqual(wire.packets[-1],b'$pwm:0,0,0,0#')
 
     def test_session_handshake_needs_no_manual_confirmation_and_diagnostics_count_writes(self):
         state = self.motor.command({'action':'arm'})
@@ -280,6 +293,32 @@ class StartupBoostTests(unittest.TestCase):
 
     def drive(self,seq=0,direction='forward',speed=80):
         return self.motor.command(dict(action='drive',session=self.owner,seq=seq,direction=direction,speed=speed))
+
+    def test_manual_low_speed_uses_one_200_startup_boost(self):
+        self.assertEqual(self.drive(speed=20)['outputs'], [200] * 4)
+        self.assertEqual(self.wire.packets[-1], b'$spd:200,200,200,200#')
+        self.now += .201
+        self.motor.check_deadline()
+        self.assertEqual(self.wire.packets[-1], b'$spd:20,20,20,20#')
+        self.assertEqual(self.drive(seq=1, direction='forward_left', speed=20)['outputs'], [40, 40, 200, 200])
+        self.assertEqual(self.drive(seq=2, direction='forward_right', speed=20)['outputs'], [200, 200, 40, 40])
+        self.assertEqual(self.drive(seq=3, direction='left', speed=20)['outputs'], [-200, -200, 200, 200])
+        self.now += .201
+        self.motor.check_deadline()
+        self.assertEqual(self.motor.snapshot()['outputs'], [-20, -20, 20, 20])
+        self.assertFalse(self.motor.snapshot()['startup_boost_active'])
+
+    def test_manual_low_speed_change_is_a_new_boosted_action(self):
+        self.assertEqual(self.drive(speed=80)['outputs'], [200] * 4)
+        self.now += .15
+        self.assertEqual(self.drive(seq=1, speed=30)['outputs'], [200] * 4)
+        self.now += .10
+        self.motor.check_deadline()
+        self.assertEqual(self.motor.snapshot()['outputs'], [200] * 4)
+        self.now += .201
+        self.motor.check_deadline()
+        self.assertEqual(self.motor.snapshot()['outputs'], [30] * 4)
+        self.assertFalse(self.motor.snapshot()['startup_boost_active'])
 
     def test_strong_arc_startup_keeps_forward_travel_instead_of_a_pure_pivot(self):
         state = self.drive(direction='forward_left', speed=80)

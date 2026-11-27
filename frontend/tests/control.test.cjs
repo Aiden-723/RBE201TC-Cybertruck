@@ -506,6 +506,14 @@ test('automatic speed is fixed at20 and cannot select a higher gear',()=>{
   c.setAutonomySpeed(30);assert.equal(c.autoSpeed,20);
 });
 
+test('PWM automatic control adopts its sole 600 gear',()=>{
+  const c=new WheelControl({fetch:async()=>{throw Error('fixture');}});
+  c.emit({autonomy:{speed_gears:[600]}});
+  assert.equal(c.autoSpeed,600);
+  c.setAutonomySpeed(550);
+  assert.equal(c.autoSpeed,600);
+});
+
 test('adding a steering key immediately sends a combined command without waiting for the interval',async()=>{
  const calls=[];const control=new WheelControl({fetch:async(_url,options)=>{const data=options.body?JSON.parse(options.body):null;calls.push(data);return reply(data?.action==='arm'?{armed:true,session:'s'}:data?.action==='drive'?{armed:true}:{enabled:true,control_key:'k',driving_mode:'manual'});}});await control.refresh();await control.start('forward',200);
  try {await control.start('forward_right',200);
