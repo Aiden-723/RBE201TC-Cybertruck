@@ -32,7 +32,7 @@ required = ["RunID","Detection point","Trigger time","Result time", ...
     "GroupID","RoomID","StationID","X_m","Y_m","SensorHeight_m","Delay_seconds"];
 allRows = table();
 for k = 1:numel(files)
-    options = detectImportOptions(files(k), 'VariableNamingRule','preserve');
+    options = detectImportOptions(files(k), 'VariableNamingRule','preserve','Delimiter',',');
     if ~all(ismember(required, string(options.VariableNames)))
         error('RBE:Schema', 'Missing coordinates/purpose/schema in %s. Do not guess locations for legacy logs.', files(k));
     end
