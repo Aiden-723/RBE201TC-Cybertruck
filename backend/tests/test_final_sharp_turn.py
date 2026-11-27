@@ -62,15 +62,15 @@ class FinalSharpTurnTests(unittest.TestCase):
         self.assertEqual(state['turn_entry_heading_deg'], 0)
         self.assertEqual(self.motor.snapshot()['outputs'], [600, 600, -600, -600])
 
-    def test_sharp_turn_reacquires_exit_across_imu_wrap(self):
+    def test_sharp_turn_accepts_line_at_120_across_imu_wrap(self):
         self.begin_final_turn()
-        for angle in (22, 56, 90, 116, 140):
+        for angle in (22, 56, 90, 116, 119):
             result = self.tick(RIGHT_EDGE, right_angle=angle)
             self.assertEqual(result['phase'], 'turn')
-        self.assertEqual(self.tick(RIGHT_EDGE, right_angle=161)['phase'], 'align')
+        self.assertEqual(self.tick(RIGHT_EDGE, right_angle=120)['phase'], 'align')
         self.assertEqual(self.motor.snapshot()['outputs'], [0] * 4)
-        self.tick(CENTER, right_angle=163)
-        state = self.tick(CENTER, right_angle=163)
+        self.tick(CENTER, right_angle=120)
+        state = self.tick(CENTER, right_angle=120)
         self.assertEqual(state['turn_index'], 15)
         self.assertEqual(state['phase'], 'follow')
         self.assertEqual(self.motor.snapshot()['outputs'], [600] * 4)

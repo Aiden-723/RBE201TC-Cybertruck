@@ -12,7 +12,7 @@ class TrackImuFollower(PositiveArcFollower):
     reverse_seconds = 0.0
     minimum_reacquire_angle = 60.0
     maximum_turn_angle = 130.0
-    sharp_minimum_reacquire_angle = 145.0
+    sharp_minimum_reacquire_angle = 120.0
     sharp_maximum_turn_angle = 180.0
     correction_outer = 20
     correction_inner = 4
